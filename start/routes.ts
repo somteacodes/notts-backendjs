@@ -27,4 +27,4 @@ Route.get('/', async () => {
 Route.get('users','UsersController.index')
 
 Route.post('auth/register/:provider','AuthController.register')
-Route.post('auth/login','AuthController.login')
+Route.post('auth/login/:provider','AuthController.login')

@@ -11,54 +11,62 @@ export default class AuthController {
     response,
     params: { provider },
   }: HttpContextContract) {
+    let user;
     if (provider === 'email') {
       const newAuthSchema = schema.create({
         email: schema.string({ trim: true }, [rules.email()]),
         password: schema.string({}, [rules.minLength(4)]),
       });
       const payload = await request.validate({ schema: newAuthSchema });
-      const user = await User.create(payload);
+      user = await User.create(payload);
       await user.related('profile').firstOrCreate({
         firstName: payload.email.split('@')[0],
       });
       await this.sendCodeToEmail(payload.email);
-      const { token } = await this.generateUserWithToken(auth, user);
-      
-      await user.refresh();
-      await user.load((loader) => {
-        loader.load('profile').load('role');
-      });
-      response.status(201);
-      return { user, token };
     }
 
     if (provider === 'google') {
       const { access_token } = request.body();
 
-      const userFromGoogle = await ally.use('google').userFromToken(access_token);
+      user = await this.authWithhGoogle(ally, access_token);
+    }
 
-      const user = await User.firstOrCreate(
-        { email: userFromGoogle.email! },
-        { emailVerifiedAt: DateTime.now(), verified: 1 }
-      );
+    const { token } = await this.generateUserWithToken(auth, user);
 
-      await user.related('profile').firstOrCreate({
-        firstName: (await this.splitName(userFromGoogle.name)).firstName,
-        lastName: (await this.splitName(userFromGoogle.name)).lastName,
-        image: userFromGoogle.avatarUrl!,
+    await user.refresh();
+    await user.load((loader) => {
+      loader.load('profile').load('role');
+    });
+    response.created({ user, token });
+  }
+  public async login({ ally, auth, request, response, params: { provider } }) {
+    let user;
+    if (provider === 'email') {
+      const newAuthSchema = schema.create({
+        email: schema.string({ trim: true }, [rules.email()]),
+        password: schema.string({}, [rules.minLength(4)]),
       });
-      const { token } = await this.generateUserWithToken(auth, user);
-     
+      const payload = await request.validate({ schema: newAuthSchema });
+      const token = await auth.use('api').attempt(payload.email, payload.password);
+      if (!token) response.badRequest({ error: 'Invalid login credentials' });
+      user = await User.findBy('email', payload.email);
       await user.refresh();
       await user.load((loader) => {
         loader.load('profile').load('role');
       });
-      response.status(201);
-      return { user, token };
+
+      response.ok({ user, token });
     }
-  }
-  public async login() {
-    return 'login user';
+    if (provider === 'google') {
+      const { access_token } = request.body();
+      user = await this.authWithhGoogle(ally, access_token);
+      const { token } = await this.generateUserWithToken(auth, user);
+      await user.refresh();
+      await user.load((loader) => {
+        loader.load('profile').load('role');
+      });
+      response.ok({ user, token });
+    }
   }
 
   async sendCodeToEmail(email) {
@@ -83,6 +91,23 @@ export default class AuthController {
 
   async generateUserWithToken(auth, user) {
     return await auth.use('api').generate(user);
+  }
+
+  async authWithhGoogle(ally, access_token) {
+    const userFromGoogle = await ally.use('google').userFromToken(access_token);
+
+    const user = await User.firstOrCreate(
+      { email: userFromGoogle.email! },
+      { emailVerifiedAt: DateTime.now(), verified: 1 }
+    );
+
+    await user.related('profile').firstOrCreate({
+      firstName: (await this.splitName(userFromGoogle.name)).firstName,
+      lastName: (await this.splitName(userFromGoogle.name)).lastName,
+      image: userFromGoogle.avatarUrl!,
+    });
+
+    return user;
   }
   async splitName(name = '') {
     const [firstName, ...lastName] = name.split(' ').filter(Boolean);
