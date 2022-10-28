@@ -40,6 +40,7 @@ export default class AuthController {
     response.created({ user, token });
   }
   public async login({ ally, auth, request, response, params: { provider } }) {
+    
     let user;
     if (provider === 'email') {
       const newAuthSchema = schema.create({
@@ -47,7 +48,7 @@ export default class AuthController {
         password: schema.string({}, [rules.minLength(4)]),
       });
       const payload = await request.validate({ schema: newAuthSchema });
-      const token = await auth.use('api').attempt(payload.email, payload.password);
+      const {token} = await auth.use('api').attempt(payload.email, payload.password);
       if (!token) response.badRequest({ error: 'Invalid login credentials' });
       user = await User.findBy('email', payload.email);
       await user.refresh();

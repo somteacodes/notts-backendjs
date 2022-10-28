@@ -27,7 +27,7 @@ export default class Profile extends BaseModel {
   @column.dateTime({ autoCreate: true, serializeAs: null})
   public createdAt: DateTime
 
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  @column.dateTime({ autoCreate: true, autoUpdate: true,serializeAs: null })
   public updatedAt: DateTime
 
     // relationships
