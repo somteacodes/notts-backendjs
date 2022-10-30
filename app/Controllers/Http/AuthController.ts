@@ -18,7 +18,13 @@ export default class AuthController {
         password: schema.string({}, [rules.minLength(4)]),
       });
       const payload = await request.validate({ schema: newAuthSchema });
-      user = await User.create(payload);
+      try {
+        user = await User.create(payload);
+      } catch {
+        response.badRequest({ error: 'Email already registered' });
+        return;
+      }
+
       await user.related('profile').firstOrCreate({
         firstName: payload.email.split('@')[0],
       });
@@ -27,8 +33,12 @@ export default class AuthController {
 
     if (provider === 'google') {
       const { access_token } = request.body();
-
-      user = await this.authWithhGoogle(ally, access_token);
+      try {
+        user = await this.authWithhGoogle(ally, access_token);
+      } catch {
+        response.badRequest({ error: 'An error occurred, please try again' });
+        return;
+      }
     }
 
     const { token } = await this.generateUserWithToken(auth, user);
@@ -40,7 +50,6 @@ export default class AuthController {
     response.created({ user, token });
   }
   public async login({ ally, auth, request, response, params: { provider } }) {
-    
     let user;
     if (provider === 'email') {
       const newAuthSchema = schema.create({
@@ -48,19 +57,28 @@ export default class AuthController {
         password: schema.string({}, [rules.minLength(4)]),
       });
       const payload = await request.validate({ schema: newAuthSchema });
-      const {token} = await auth.use('api').attempt(payload.email, payload.password);
-      if (!token) response.badRequest({ error: 'Invalid login credentials' });
-      user = await User.findBy('email', payload.email);
-      await user.refresh();
-      await user.load((loader) => {
-        loader.load('profile').load('role');
-      });
+      try {
+        const { token } = await auth.use('api').attempt(payload.email, payload.password);
+        user = await User.findBy('email', payload.email);
+        await user.refresh();
+        await user.load((loader) => {
+          loader.load('profile').load('role');
+        });
 
-      response.ok({ user, token });
+        response.ok({ user, token });
+      } catch {
+        response.badRequest({ error: 'Invalid login credentials.' }); 
+      }
     }
     if (provider === 'google') {
       const { access_token } = request.body();
-      user = await this.authWithhGoogle(ally, access_token);
+      try{
+        user = await this.authWithhGoogle(ally, access_token);
+      }
+      catch{
+        response.badRequest({ error: 'Any error occurred, please try again.'})
+        return
+      }
       const { token } = await this.generateUserWithToken(auth, user);
       await user.refresh();
       await user.load((loader) => {
