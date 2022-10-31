@@ -1,4 +1,4 @@
 web: node build/server.js
 release: 
-node ace migration:run — force
-node ace migration:fresh --seed
+node build/ace migration:run --force
+node ace db:seed
