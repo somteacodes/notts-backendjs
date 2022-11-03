@@ -67,17 +67,16 @@ export default class AuthController {
 
         response.ok({ user, token });
       } catch {
-        response.badRequest({ error: 'Invalid login credentials.' }); 
+        response.badRequest({ error: 'Invalid login credentials.' });
       }
     }
     if (provider === 'google') {
       const { access_token } = request.body();
-      try{
+      try {
         user = await this.authWithhGoogle(ally, access_token);
-      }
-      catch{
-        response.badRequest({ error: 'Any error occurred, please try again.'})
-        return
+      } catch {
+        response.badRequest({ error: 'Any error occurred, please try again.' });
+        return;
       }
       const { token } = await this.generateUserWithToken(auth, user);
       await user.refresh();
@@ -88,6 +87,37 @@ export default class AuthController {
     }
   }
 
+  public async verifyCodeFromEmail({ request, response }) {
+    const jwt = require('jsonwebtoken');
+    const { code } = request.body();
+ 
+    try {
+      const { data } = await jwt.verify(code, 'notts2022@!');
+      const user = await User.findBy('email', data);
+      user!.verified = 1;
+      await user!.save();
+       
+      response.ok({message:'email has been verified'});
+    } catch (error) {
+      const {
+        payload: { data },
+      } = await jwt.decode(code, { complete: true });
+
+      this.sendCodeToEmail(data);
+      response.badRequest({ error: 'another another code has been sent' });
+      return;
+    }
+  }
+
+  public async requestVerification({ request, response }) {
+    const { email } = request.body();
+    try {
+      await this.sendCodeToEmail(email);
+      response.ok({ message: 'Validation link sent to your email' });
+    } catch (error) {
+      response.badRequest({ error})
+    }
+  }
   async sendCodeToEmail(email) {
     const jwt = require('jsonwebtoken');
     const token = jwt.sign(
@@ -103,7 +133,7 @@ export default class AuthController {
         .to(email)
         .subject('Verify your account')
         .htmlView('emails/verify', {
-          url: `https//www.notts.com.ng/verify/?token=${token}`,
+          url: `https://www.notts.com.ng/verify?token=${token}`,
         });
     });
   }

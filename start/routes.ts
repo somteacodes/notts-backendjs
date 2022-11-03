@@ -28,3 +28,5 @@ Route.get('users','UsersController.index')
 
 Route.post('auth/register/:provider','AuthController.register')
 Route.post('auth/login/:provider','AuthController.login')
+Route.post('verify/email', 'AuthController.verifyCodeFromEmail')
+Route.post('requestVerification/email', 'AuthController.requestVerification')
