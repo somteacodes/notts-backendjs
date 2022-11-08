@@ -13,8 +13,8 @@ export default class UsersController {
       size: '10mb',
       extnames: ['jpg', 'png', 'gif'],
     });
-    if (!userImage.isValid) {
-      response.badRequest(userImage.errors[0].message);
+    if (!userImage?.isValid) {
+      response.badRequest(userImage?.errors[0].message);
       return;
     }
 
