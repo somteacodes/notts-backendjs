@@ -33,4 +33,4 @@ Route.post('auth/login/:provider','AuthController.login')
 // protected routes
 Route.post('requestVerification/email', 'AuthController.requestVerification')
 Route.post('verify/email', 'AuthController.verifyCodeFromEmail')
-Route.post('user/upload', 'UsersController.uploadImage')
+Route.post('user/upload/image', 'UsersController.uploadImage') 

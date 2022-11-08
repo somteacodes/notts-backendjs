@@ -25,7 +25,9 @@
     "@adonisjs/auth",
     "@adonisjs/ally",
     "@adonisjs/mail",
-    "@adonisjs/view"
+    "@adonisjs/view",
+    "@adonisjs/drive-s3",
+    "@adonisjs/drive-gcs"
   ],
   "aceProviders": [
     "@adonisjs/repl"
