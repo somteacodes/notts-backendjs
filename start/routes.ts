@@ -21,7 +21,7 @@
 import Route from '@ioc:Adonis/Core/Route';
 
 Route.get('/', async () => {
-  return { hello: 'world' };
+  return ' notts api reached';
 });
 
 Route.get('users','UsersController.index')
