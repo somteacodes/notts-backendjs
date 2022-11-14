@@ -1,5 +1,5 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
-import Application from '@ioc:Adonis/Core/Application';
+// import Application from '@ioc:Adonis/Core/Application';
 import Drive from '@ioc:Adonis/Core/Drive';
 
 export default class UsersController {
@@ -7,7 +7,7 @@ export default class UsersController {
     return 'Get Users';
   }
 
-  public async uploadImage({ request, response }) {
+  public async uploadImage({ request, response }:HttpContextContract) {
     // TODO get username from auth access token
     const userImage = request.file('user_image', {
       size: '10mb',
@@ -20,7 +20,7 @@ export default class UsersController {
 
     try {
       await userImage.moveToDisk('./', {}, 's3');
-      const url = await Drive.getUrl(userImage.fileName);
+      const url = await Drive.getUrl(userImage.fileName||"");
       response.ok({ url });
     } catch (error) {
       response.badRequest({ error });
