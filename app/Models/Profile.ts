@@ -13,13 +13,13 @@ export default class Profile extends BaseModel {
   public firstName:string
 
   @column()
-  public lastName?:string
+  public lastName:string|null
 
   @column()
-  public phone?:string
+  public phone:string|null
 
   @column()
-  public image?:string
+  public image:string|null
 
   @column.dateTime()
   public dob?:DateTime

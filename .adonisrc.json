@@ -27,7 +27,8 @@
     "@adonisjs/mail",
     "@adonisjs/view",
     "@adonisjs/drive-s3",
-    "@adonisjs/drive-gcs"
+    "@adonisjs/drive-gcs",
+    "@adonisjs/lucid-slugify"
   ],
   "aceProviders": [
     "@adonisjs/repl"

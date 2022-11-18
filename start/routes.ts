@@ -24,13 +24,16 @@ Route.get('/', async () => {
   return ' notts api reached';
 });
 
-Route.get('users','UsersController.index')
+Route.get('users', 'UsersController.index');
 
-Route.post('auth/register/:provider','AuthController.register')
-Route.post('auth/login/:provider','AuthController.login')
-
+Route.post('auth/register/:provider', 'AuthController.register');
+Route.post('auth/login/:provider', 'AuthController.login');
 
 // protected routes
-Route.post('requestVerification/email', 'AuthController.requestVerification')
-Route.post('verify/email', 'AuthController.verifyCodeFromEmail')
-Route.post('user/upload/image', 'UsersController.uploadImage') 
+
+Route.group(() => {
+  Route.post('requestVerification/email', 'AuthController.requestVerification');
+  Route.post('verify/email', 'AuthController.verifyCodeFromEmail');
+  Route.post('user/upload/image', 'UsersController.uploadImage');
+  Route.post('campaign/create', 'CampaignsController.createCampaign');
+}).middleware(['auth']);

@@ -1,8 +1,9 @@
 import { DateTime } from 'luxon';
 import Hash from '@ioc:Adonis/Core/Hash';
-import { column, beforeSave, BaseModel, hasOne, HasOne, belongsTo, BelongsTo } from '@ioc:Adonis/Lucid/Orm';
+import { column, beforeSave, BaseModel, hasOne, HasOne, belongsTo, BelongsTo, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm';
 import Profile from 'App/Models/Profile';
 import Role from './Role';
+import Campaign from './Campaign';
 export default class User extends BaseModel {
   @column({ isPrimary: true, serializeAs: null })
   public id: number;
@@ -17,19 +18,19 @@ export default class User extends BaseModel {
   public password: string;
 
   @column()
-  public uuid?: string;
+  public uuid: string|null;
 
   @column()
-  public rememberMeToken?: string | null;
+  public rememberMeToken: string | null;
 
   @column.dateTime()
-  public emailVerifiedAt?: DateTime;
+  public emailVerifiedAt: DateTime|null;
 
   @column()
-  public verified?: number;
+  public verified: number|null;
 
   @column({ serializeAs: null })
-  public verificationCode?: string;
+  public verificationCode: string|null;
 
   @column.dateTime({ autoCreate: true, serializeAs: null })
   public createdAt: DateTime;
@@ -49,4 +50,7 @@ export default class User extends BaseModel {
 
   @belongsTo(()=>Role)
   public role:BelongsTo<typeof Role>
+
+  @hasMany(()=>Campaign)
+  public campaign:HasMany<typeof Campaign>
 }
