@@ -1,28 +1,37 @@
 import { DateTime } from 'luxon';
-import { BaseModel, beforeSave, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm';
+import {
+  BaseModel,
+  BelongsTo,
+  belongsTo,
+  column,
+  HasMany,
+  hasMany,
+} from '@ioc:Adonis/Lucid/Orm';
 import Category from './Category';
 import User from './User';
 import { slugify } from '@ioc:Adonis/Addons/LucidSlugify';
+import Reward from './Reward';
+import Donation from './Donation';
 
 export default class Campaign extends BaseModel {
   @column({ isPrimary: true })
   public id: number;
 
-  @column({serializeAs: null})
+  @column({ serializeAs: null })
   public userId: number;
 
-  @column({serializeAs: null})
+  @column({ serializeAs: null })
   public categoryId: number;
 
   @column()
   public name: string;
-  
+
   @column()
   @slugify({
     strategy: 'dbIncrement',
-    fields: ['name']
+    fields: ['name'],
   })
-  public slug: string
+  public slug: string;
 
   // @column()
   // public cid: string;
@@ -45,17 +54,22 @@ export default class Campaign extends BaseModel {
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime;
 
-  @column.dateTime({ autoCreate: true, autoUpdate: true, serializeAs: null})
+  @column.dateTime({ autoCreate: true, autoUpdate: true, serializeAs: null })
   public updatedAt: DateTime;
 
   // relationship
   @belongsTo(() => Category)
   public category: BelongsTo<typeof Category>;
- 
+
   @belongsTo(() => User)
   public user: BelongsTo<typeof User>;
 
+  @hasMany(() => Reward)
+  public rewards: HasMany<typeof Reward>;
 
+  @hasMany(() => Donation)
+  public donations: HasMany<typeof Donation>;
+  
   // @beforeSave()
   // public static async changeToDate(campaign:Campaign){
   //   if(campaign.$dirty.endDate){
