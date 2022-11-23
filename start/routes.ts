@@ -35,5 +35,7 @@ Route.group(() => {
   Route.post('requestVerification/email', 'AuthController.requestVerification');
   Route.post('verify/email', 'AuthController.verifyCodeFromEmail');
   Route.post('user/upload/image', 'UsersController.uploadImage');
+  Route.post('campaign/upload/image', 'CampaignsController.uploadImage')
   Route.post('campaign/create', 'CampaignsController.createCampaign');
+  Route.get('campaign/d/view/:type/:slug','CampaignsController.viewMyCampaign')
 }).middleware(['auth']);

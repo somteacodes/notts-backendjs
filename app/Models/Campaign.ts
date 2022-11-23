@@ -8,10 +8,10 @@ export default class Campaign extends BaseModel {
   @column({ isPrimary: true })
   public id: number;
 
-  @column()
+  @column({serializeAs: null})
   public userId: number;
 
-  @column()
+  @column({serializeAs: null})
   public categoryId: number;
 
   @column()
