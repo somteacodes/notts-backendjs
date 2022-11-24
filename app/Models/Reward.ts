@@ -1,13 +1,14 @@
 import { DateTime } from 'luxon';
 import { BaseModel, belongsTo, BelongsTo, column } from '@ioc:Adonis/Lucid/Orm';
-import Category from './Category';
+ 
+import Campaign from './Campaign';
 
 export default class Reward extends BaseModel {
   @column({ isPrimary: true })
   public id: number;
 
   @column({ serializeAs: null })
-  public categoryId: number;
+  public campaignId: number;
 
   @column()
   public name: string;
@@ -28,6 +29,6 @@ export default class Reward extends BaseModel {
   public updatedAt: DateTime;
 
     // relationship
-    @belongsTo(() => Category)
-    public category: BelongsTo<typeof Category>;
+    @belongsTo(() => Campaign)
+    public campaign: BelongsTo<typeof Campaign>;
 }

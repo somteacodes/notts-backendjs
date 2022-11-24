@@ -38,4 +38,5 @@ Route.group(() => {
   Route.post('campaign/upload/image', 'CampaignsController.uploadImage')
   Route.post('campaign/create', 'CampaignsController.createCampaign');
   Route.get('campaign/d/view/:type/:slug','CampaignsController.viewMyCampaign')
+  Route.post('reward/create','RewardsController.createReward')
 }).middleware(['auth']);
