@@ -47,4 +47,15 @@ export default class RewardsController {
       response.badRequest({ error: errors });
     }
   }
+
+  public async getRewards({ request, response}: HttpContextContract){
+    // const requestBody = request.body();
+    const params = request.params();
+    const campaign = await Campaign.query()
+    .where('slug', params.slug) 
+    .firstOrFail();
+
+    const rewards = await campaign.related('rewards').query()
+   response.ok(rewards);
+  }
 }

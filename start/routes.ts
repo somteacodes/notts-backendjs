@@ -39,4 +39,5 @@ Route.group(() => {
   Route.post('campaign/create', 'CampaignsController.createCampaign');
   Route.get('campaign/d/view/:type/:slug','CampaignsController.viewMyCampaign')
   Route.post('reward/create','RewardsController.createReward')
+  Route.get('rewards/view/:slug','RewardsController.getRewards')
 }).middleware(['auth']);
