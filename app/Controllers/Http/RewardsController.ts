@@ -1,7 +1,6 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import Drive from '@ioc:Adonis/Core/Drive';
 import Campaign from 'App/Models/Campaign';
-import Reward from 'App/Models/Reward';
 
 export default class RewardsController {
   public async createReward({ auth, request, response }: HttpContextContract) {
