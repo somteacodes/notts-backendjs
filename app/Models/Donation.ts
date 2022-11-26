@@ -6,7 +6,7 @@ export default class Donation extends BaseModel {
   public id: number
 
   @column({ serializeAs: null })
-  public categoryId: number;
+  public campaignId: number;
 
   @column({ serializeAs: null })
   public userId: number;

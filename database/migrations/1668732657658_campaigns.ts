@@ -10,12 +10,13 @@ export default class extends BaseSchema {
       table.integer('category_id').references('categories.id');
       table.string('name');
       // table.string('cid').unique();
-      table.string('slug').unique()
+      table.string('slug',180).unique()
       table.integer('amount');
       table.string('end_date');
       table.text('description');
       table.string('image').nullable();
       table.boolean('verified').defaultTo(false).nullable();
+      table.boolean('featured').defaultTo(false).nullable();
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL

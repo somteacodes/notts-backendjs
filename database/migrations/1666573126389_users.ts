@@ -7,7 +7,7 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id').primary()
       table.integer('role_id').unsigned().references('roles.id').defaultTo(2)
-      table.string('email', 255).notNullable().unique()
+      table.string('email',180).notNullable().unique()
       table.string('password',180).nullable()
       table.string('remember_me_token').nullable()
       table.string('uuid').nullable()

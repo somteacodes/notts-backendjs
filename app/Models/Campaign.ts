@@ -14,6 +14,7 @@ import Reward from './Reward';
 import Donation from './Donation';
 
 export default class Campaign extends BaseModel {
+  public serializeExtras = true
   @column({ isPrimary: true })
   public id: number;
 
@@ -51,6 +52,10 @@ export default class Campaign extends BaseModel {
   @column({ serializeAs: null })
   public verified: number | null;
 
+  @column({ serializeAs: null })
+  public featured: number | null;
+
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime;
 
@@ -67,8 +72,10 @@ export default class Campaign extends BaseModel {
   @hasMany(() => Reward)
   public rewards: HasMany<typeof Reward>;
 
+
   @hasMany(() => Donation)
   public donations: HasMany<typeof Donation>;
+
   
   // @beforeSave()
   // public static async changeToDate(campaign:Campaign){
