@@ -1,8 +1,7 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import { schema } from '@ioc:Adonis/Core/Validator';
 import Drive from '@ioc:Adonis/Core/Drive';
-import Campaign from 'App/Models/Campaign';
-import Database from '@ioc:Adonis/Lucid/Database';
+import Campaign from 'App/Models/Campaign'; 
 export default class CampaignsController {
   public async createCampaign({ auth, request, response }: HttpContextContract) {
     const user = await auth.user;
