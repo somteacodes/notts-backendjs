@@ -22,6 +22,9 @@ export default class Reward extends BaseModel {
   @column()
   public image: string | null;
 
+  @column()
+  public count:number|null;
+
   @column.dateTime({ autoCreate: true, serializeAs: null })
   public createdAt: DateTime;
 

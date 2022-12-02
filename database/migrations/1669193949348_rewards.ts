@@ -11,6 +11,7 @@ export default class extends BaseSchema {
       table.integer('target');
       table.text('description').nullable();
       table.string('image').nullable();
+      table.integer('count').nullable();
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
