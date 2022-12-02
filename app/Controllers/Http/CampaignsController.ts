@@ -2,6 +2,7 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import { schema } from '@ioc:Adonis/Core/Validator';
 import Drive from '@ioc:Adonis/Core/Drive';
 import Campaign from 'App/Models/Campaign';
+import Database from '@ioc:Adonis/Lucid/Database';
 export default class CampaignsController {
   public async createCampaign({ auth, request, response }: HttpContextContract) {
     const user = await auth.user;
@@ -105,11 +106,15 @@ export default class CampaignsController {
     .preload('user', (pq) => {
       pq.preload('profile');
     })
+    
     .withAggregate('rewards', (query) => {
       query.count('*').as('rewards_count')
     })
     .withAggregate('donations', (query) => {
       query.count('*').as('donations_count')
+    })
+    .withAggregate('donations', (query) => {
+      query.sum('amount').as('donated_total')
     })
     .orderBy('id', 'desc')
     .limit(10)
