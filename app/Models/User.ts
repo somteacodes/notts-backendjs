@@ -4,6 +4,7 @@ import { column, beforeSave, BaseModel, hasOne, HasOne, belongsTo, BelongsTo, ha
 import Profile from 'App/Models/Profile';
 import Role from './Role';
 import Campaign from './Campaign';
+import Donation from './Donation';
 export default class User extends BaseModel {
   @column({ isPrimary: true, serializeAs: null })
   public id: number;
@@ -52,5 +53,8 @@ export default class User extends BaseModel {
   public role:BelongsTo<typeof Role>
 
   @hasMany(()=>Campaign)
-  public campaign:HasMany<typeof Campaign>
+  public campaigns:HasMany<typeof Campaign>
+
+  @hasMany(()=>Donation)
+  public donations:HasMany<typeof Donation>
 }

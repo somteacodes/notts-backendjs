@@ -1,7 +1,7 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import { schema } from '@ioc:Adonis/Core/Validator';
 import Drive from '@ioc:Adonis/Core/Drive';
-import Campaign from 'App/Models/Campaign'; 
+import Campaign from 'App/Models/Campaign';
 export default class CampaignsController {
   public async createCampaign({ auth, request, response }: HttpContextContract) {
     const user = await auth.user;
@@ -18,7 +18,7 @@ export default class CampaignsController {
     });
     const payload = await request.validate({ schema: newCampaignSchema });
     try {
-      const newCampaign = await user?.related('campaign').create(payload);
+      const newCampaign = await user?.related('campaigns').create(payload);
       response.ok(newCampaign);
       return;
     } catch (error) {
@@ -45,15 +45,15 @@ export default class CampaignsController {
         pq.preload('profile');
       })
       .withAggregate('rewards', (query) => {
-        query.count('*').as('rewards_count')
+        query.count('*').as('rewards_count');
       })
       .withAggregate('donations', (query) => {
-        query.count('*').as('donations_count')
-      }) 
+        query.count('*').as('donations_count');
+      })
       .firstOrFail();
 
-      // await campaign.loadCount('rewards')
- 
+    // await campaign.loadCount('rewards')
+
     // campaign?.related('user');
     campaign.user.email === user.email
       ? response.ok(campaign)
@@ -94,30 +94,57 @@ export default class CampaignsController {
     }
   }
 
-
-  public async getFeaturedCampaigns({ response}:HttpContextContract){
-
+  public async getFeaturedCampaigns({ response }: HttpContextContract) {
     const campaigns = await Campaign.query()
-    .withCount('rewards')
-    .andWhere('verified',true)
-    .andWhere('featured',true)
-    .preload('category')
-    .preload('user', (pq) => {
-      pq.preload('profile');
-    })
-    
-    .withAggregate('rewards', (query) => {
-      query.count('*').as('rewards_count')
-    })
-    .withAggregate('donations', (query) => {
-      query.count('*').as('donations_count')
-    })
-    .withAggregate('donations', (query) => {
-      query.sum('amount').as('donated_total')
-    })
-    .orderBy('id', 'desc')
-    .limit(10)
+      .andWhere('verified', true)
+      .andWhere('featured', true)
+      .preload('category')
+      .preload('rewards')
+      .preload('user', (pq) => {
+        pq.preload('profile');
+      })
 
-    response.ok(campaigns)
+      .withAggregate('rewards', (query) => {
+        query.count('*').as('rewards_count');
+      })
+      .withAggregate('donations', (query) => {
+        query.count('*').as('donations_count');
+      })
+      .withAggregate('donations', (query) => {
+        query.sum('amount').as('donated_total');
+      })
+      .orderBy('id', 'desc')
+      .limit(10);
+
+    response.ok(campaigns);
+  }
+
+  public async getCampaignBySlug({ request, response }: HttpContextContract) {
+    const { slug } = request.params();
+    const campaign = await Campaign.query()
+      .andWhere('verified', true)
+      .andWhere('slug', slug)
+      .preload('category')
+      .preload('rewards')
+      .preload('donations', (donationsQuery) => {
+        donationsQuery
+          .preload('user', (userQuery) => {
+            userQuery.preload('profile');
+          })
+          .limit(3);
+      })
+      .preload('user', (userQuery) => {
+        userQuery.preload('profile');
+      })
+      .withAggregate('rewards', (query) => {
+        query.count('*').as('rewards_count');
+      })
+      .withAggregate('donations', (query) => {
+        query.count('*').as('donations_count');
+      })
+      .withAggregate('donations', (query) => {
+        query.sum('amount').as('donated_total');
+      });
+    response.ok(campaign);
   }
 }
