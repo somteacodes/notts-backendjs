@@ -41,6 +41,7 @@ export default class CampaignsController {
       .withCount('rewards')
       // .andWhere('user_id', user.id)
       .preload('category')
+      .preload('rewards')
       .preload('user', (pq) => {
         pq.preload('profile');
       })
@@ -49,6 +50,9 @@ export default class CampaignsController {
       })
       .withAggregate('donations', (query) => {
         query.count('*').as('donations_count');
+      })
+      .withAggregate('donations', (query) => {
+        query.sum('amount').as('donated_total');
       })
       .firstOrFail();
 
@@ -144,7 +148,9 @@ export default class CampaignsController {
       })
       .withAggregate('donations', (query) => {
         query.sum('amount').as('donated_total');
-      });
+      })
+      .first()
+      ;
     response.ok(campaign);
   }
 }
