@@ -29,7 +29,7 @@ Route.get('users', 'UsersController.index');
 Route.post('auth/register/:provider', 'AuthController.register');
 Route.post('auth/login/:provider', 'AuthController.login');
 Route.get('campaigns/all/featured', 'CampaignsController.getFeaturedCampaigns')
-Route.get('campaigns/view/:slug','CampaignsController.getCampaignBySlug')
+Route.get('campaign/view/:slug','CampaignsController.getCampaignBySlug')
  Route.get('rewards/view/:slug','RewardsController.getRewards') //TODO this could be redundant, confirm where it is needed and clear this comment
 // protected routes
 
