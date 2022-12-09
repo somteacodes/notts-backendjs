@@ -44,7 +44,7 @@ const corsConfig: CorsConfig = {
   |                     one of the above values.
   |
   */
-  origin: ['http://localhost:5173', 'https://www.notts.com.ng'],
+  origin: ['http://localhost:5173', 'https://www.notts.com.ng','http://127.0.0.1:5173'],
 
   /*
   |--------------------------------------------------------------------------
