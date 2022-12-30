@@ -8,8 +8,7 @@
     "start": "node server.js",
     "lint": "eslint . --ext=.ts",
     "format": "prettier --write .",
-
-    "deploy":"node ./build/server.js"
+    "deploy": "cd build && npm ci --production && npm run start"
   },
   "eslintConfig": {
     "extends": [
