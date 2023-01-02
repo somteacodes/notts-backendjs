@@ -97,11 +97,26 @@ export default class CampaignsController {
       response.badRequest({ error });
     }
   }
+  public async getCampaignsByType({ response, params: { type = 'all' } }: HttpContextContract) {
+    if (type === 'featured') {
+      const campaigns = await this.Campaigns().andWhere('featured', true).paginate(1, 10);
 
-  public async getFeaturedCampaigns({ response }: HttpContextContract) {
+      response.ok(campaigns);
+      return;
+    }
+    if (type === 'trending') {
+      const campaigns = await this.Campaigns().paginate(1, 10);
+      response.ok(campaigns);
+      return;
+    }
+    const campaigns = {};
+    response.ok(campaigns);
+    return;
+  }
+
+  public async getAllCampaigns({ response }: HttpContextContract) {
     const campaigns = await Campaign.query()
-      .andWhere('verified', true)
-      .andWhere('featured', true)
+      .andWhere('verified', true) 
       .preload('category')
       .preload('rewards')
       .preload('user', (pq) => {
@@ -118,7 +133,7 @@ export default class CampaignsController {
         query.sum('amount').as('donated_total');
       })
       .orderBy('id', 'desc')
-      .limit(10);
+      .paginate(1,10);
 
     response.ok(campaigns);
   }
@@ -149,8 +164,28 @@ export default class CampaignsController {
       .withAggregate('donations', (query) => {
         query.sum('amount').as('donated_total');
       })
-      .first()
-      ;
+      .first();
     response.ok(campaign);
+  }
+
+  protected Campaigns() {
+    return Campaign.query()
+      .andWhere('verified', true)
+      .preload('category')
+      .preload('rewards')
+      .preload('user', (pq) => {
+        pq.preload('profile');
+      })
+
+      .withAggregate('rewards', (query) => {
+        query.count('*').as('rewards_count');
+      })
+      .withAggregate('donations', (query) => {
+        query.count('*').as('donations_count');
+      })
+      .withAggregate('donations', (query) => {
+        query.sum('amount').as('donated_total');
+      })
+      .orderBy('id', 'desc');
   }
 }
