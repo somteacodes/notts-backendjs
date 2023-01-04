@@ -20,6 +20,12 @@ export default class Donation extends BaseModel {
   public amount: number;
 
   @column()
+  public paymentRef: string;
+
+  @column()
+  public paymentChannel: string|null;
+
+  @column()
   public claimed_reward: number|null;
 
   @column.dateTime({ autoCreate: true })

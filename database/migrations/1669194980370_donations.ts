@@ -10,6 +10,8 @@ export default class extends BaseSchema {
       table.integer('user_id').references('users.id')
       table.integer('reward_id').references('rewards.id').nullable();
       table.integer('amount')
+      table.string('payment_ref')
+      table.string('payment_channel').defaultTo('paystack')
       table.integer('claimed_reward').nullable().defaultTo(0)
 
       /**
