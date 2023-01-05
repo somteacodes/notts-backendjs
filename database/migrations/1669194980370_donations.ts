@@ -8,6 +8,7 @@ export default class extends BaseSchema {
       table.increments('id')
       table.integer('campaign_id').references('campaigns.id').onDelete('CASCADE');
       table.integer('user_id').references('users.id')
+      table.integer('owner_id').references('users.id')
       table.integer('reward_id').references('rewards.id').nullable();
       table.integer('amount')
       table.string('payment_ref')

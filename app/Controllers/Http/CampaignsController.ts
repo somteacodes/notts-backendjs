@@ -116,7 +116,7 @@ export default class CampaignsController {
 
   public async getAllCampaigns({ response }: HttpContextContract) {
     const campaigns = await Campaign.query()
-      .andWhere('verified', true) 
+      .andWhere('verified', true)
       .preload('category')
       .preload('rewards')
       .preload('user', (pq) => {
@@ -133,7 +133,7 @@ export default class CampaignsController {
         query.sum('amount').as('donated_total');
       })
       .orderBy('id', 'desc')
-      .paginate(1,10);
+      .paginate(1, 10);
 
     response.ok(campaigns);
   }

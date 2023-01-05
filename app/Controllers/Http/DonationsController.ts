@@ -2,6 +2,7 @@ import { schema, rules } from '@ioc:Adonis/Core/Validator';
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import Campaign from 'App/Models/Campaign';
 import Donation from 'App/Models/Donation';
+import User from 'App/Models/User';
 
 export default class DonationsController {
   public async saveDonation({ auth, request, response }: HttpContextContract) {
@@ -16,6 +17,7 @@ export default class DonationsController {
     const saveDonationSchema = schema.create({
       campaign: schema.string([rules.trim()]),
       donatedAmount: schema.number(),
+      owner:schema.string([rules.trim()]),
       donator: schema.string([rules.trim()]),
       paymentRef: schema.string([rules.trim()]),
       paymentChannel: schema.string.nullableAndOptional([rules.trim()]),
@@ -26,12 +28,14 @@ export default class DonationsController {
       response.forbidden('Login to your account to make a donation');
       return;
     }
+    const ownerDetails = await User.findByOrFail('email', payload.owner);
     // get campaign ID
     const campaign = await Campaign.findBy('slug', payload.campaign);
 
     const data = {
       campaign_id: campaign?.id,
       user_id: user.id,
+      owner_id:ownerDetails.id,
       reward_id: payload.reward || null,
       amount: payload.donatedAmount,
       payment_ref: payload.paymentRef,

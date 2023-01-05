@@ -14,6 +14,9 @@ export default class Donation extends BaseModel {
   public userId: number;
 
   @column({ serializeAs: null })
+  public ownerId: number;
+
+  @column({ serializeAs: null })
   public rewardId: number|null;
 
   @column()
