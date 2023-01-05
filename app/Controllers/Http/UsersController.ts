@@ -1,8 +1,6 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 // import Application from '@ioc:Adonis/Core/Application';
 import Drive from '@ioc:Adonis/Core/Drive';
-import Donation from 'App/Models/Donation';
-import User from 'App/Models/User';
 import Database from '@ioc:Adonis/Lucid/Database';
 
 export default class UsersController {
