@@ -99,13 +99,16 @@ export default class CampaignsController {
   }
   public async getCampaignsByType({ response, params: { type = 'all' } }: HttpContextContract) {
     if (type === 'featured') {
-      const campaigns = await this.Campaigns().andWhere('featured', true).paginate(1, 10);
+      const campaigns = await this.Campaigns()
+        .andWhere('featured', true)
+        .orderBy('id', 'desc')
+        .paginate(1, 10);
 
       response.ok(campaigns);
       return;
     }
     if (type === 'trending') {
-      const campaigns = await this.Campaigns().paginate(1, 10);
+      const campaigns = await this.Campaigns().orderBy('id', 'desc').paginate(1, 10);
       response.ok(campaigns);
       return;
     }
@@ -114,55 +117,44 @@ export default class CampaignsController {
     return;
   }
 
-  public async getAllCampaigns({ response }: HttpContextContract) {
-    const campaigns = await Campaign.query()
-      .andWhere('verified', true)
-      .preload('category')
-      .preload('rewards')
-      .preload('user', (pq) => {
-        pq.preload('profile');
-      })
+  public async getAllCampaigns({ response, request }: HttpContextContract) {
+    let campaignsData={met:{},data:[]};
+    const queryParams = request.qs();
+    const { search, page = 1, category, sort = 'desc' } = queryParams;
 
-      .withAggregate('rewards', (query) => {
-        query.count('*').as('rewards_count');
-      })
-      .withAggregate('donations', (query) => {
-        query.count('*').as('donations_count');
-      })
-      .withAggregate('donations', (query) => {
-        query.sum('amount').as('donated_total');
-      })
-      .orderBy('id', 'desc')
-      .paginate(1, 10);
-
-    response.ok(campaigns);
+    if (search) {
+      // campaigns = await this.Campaigns().andWhereLike('name', 'new');
+     return await this.Campaigns()
+        .andWhere('name', 'like', `%${search}%`)
+        .orderBy('id', sort)
+        .paginate(page, 10);
+    }
+    if (category) {
+     return await this.Campaigns()
+        .andWhereHas('category', (q) => {
+          q.where('id', category);
+        })
+        .orderBy('id', sort)
+        .paginate(page, 10);
+    }
+    return await this.Campaigns()
+     
+    .orderBy('id', sort)
+    .paginate(page, 10);
+    
   }
 
   public async getCampaignBySlug({ request, response }: HttpContextContract) {
     const { slug } = request.params();
-    const campaign = await Campaign.query()
-      .andWhere('verified', true)
+    const campaign = await this.Campaigns()
       .andWhere('slug', slug)
-      .preload('category')
-      .preload('rewards')
       .preload('donations', (donationsQuery) => {
         donationsQuery
           .preload('user', (userQuery) => {
             userQuery.preload('profile');
           })
+          .orderBy('id', 'desc')
           .limit(3);
-      })
-      .preload('user', (userQuery) => {
-        userQuery.preload('profile');
-      })
-      .withAggregate('rewards', (query) => {
-        query.count('*').as('rewards_count');
-      })
-      .withAggregate('donations', (query) => {
-        query.count('*').as('donations_count');
-      })
-      .withAggregate('donations', (query) => {
-        query.sum('amount').as('donated_total');
       })
       .first();
     response.ok(campaign);
@@ -185,7 +177,6 @@ export default class CampaignsController {
       })
       .withAggregate('donations', (query) => {
         query.sum('amount').as('donated_total');
-      })
-      .orderBy('id', 'desc');
+      });
   }
 }
