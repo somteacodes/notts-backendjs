@@ -118,30 +118,33 @@ export default class CampaignsController {
   }
 
   public async getAllCampaigns({ response, request }: HttpContextContract) {
-    let campaignsData={met:{},data:[]};
     const queryParams = request.qs();
     const { search, page = 1, category, sort = 'desc' } = queryParams;
 
-    if (search) {
-      // campaigns = await this.Campaigns().andWhereLike('name', 'new');
-     return await this.Campaigns()
-        .andWhere('name', 'like', `%${search}%`)
-        .orderBy('id', sort)
-        .paginate(page, 10);
+    if (search) {    
+      response.ok(
+        await this.Campaigns()
+          .andWhere('name', 'like', `%${search}%`)
+          .orderBy('id', sort)
+          .paginate(page, 10)
+      );
     }
     if (category) {
-     return await this.Campaigns()
-        .andWhereHas('category', (q) => {
-          q.where('id', category);
-        })
-        .orderBy('id', sort)
-        .paginate(page, 10);
+      response.ok(
+        await this.Campaigns()
+          .andWhereHas('category', (q) => {
+            q.where('id', category);
+          })
+          .orderBy('id', sort)
+          .paginate(page, 10)
+      );
     }
-    return await this.Campaigns()
-     
-    .orderBy('id', sort)
-    .paginate(page, 10);
-    
+    response.ok(
+      await this.Campaigns()
+
+        .orderBy('id', sort)
+        .paginate(page, 10)
+    );
   }
 
   public async getCampaignBySlug({ request, response }: HttpContextContract) {
