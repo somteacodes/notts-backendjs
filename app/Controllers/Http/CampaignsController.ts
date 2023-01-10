@@ -128,6 +128,7 @@ export default class CampaignsController {
           .orderBy('id', sort)
           .paginate(page, 10)
       );
+      return
     }
     if (category) {
       response.ok(
@@ -138,6 +139,7 @@ export default class CampaignsController {
           .orderBy('id', sort)
           .paginate(page, 10)
       );
+      return
     }
     response.ok(
       await this.Campaigns()
@@ -145,6 +147,7 @@ export default class CampaignsController {
         .orderBy('id', sort)
         .paginate(page, 10)
     );
+    return
   }
 
   public async getCampaignBySlug({ request, response }: HttpContextContract) {
