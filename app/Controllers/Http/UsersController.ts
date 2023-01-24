@@ -34,7 +34,25 @@ export default class UsersController {
     }
   }
 
-  public async getUserDonationDetails({ auth, response }: HttpContextContract) {
+  public async getUserCampaignStats({ auth, response }: HttpContextContract) {
+    let loggedUser = await auth.user;
+    const verfiedCampaigns = await Database.from('campaigns')
+      .where('user_id', '=', loggedUser?.id || 0)
+      .where('verified', '=', 1)
+      .count('* as verified')
+      // .sum('amount as donated')
+      .firstOrFail();
+      const unverfiedCampaigns = await Database.from('campaigns')
+      .where('user_id', '=', loggedUser?.id || 0)
+      .where('verified', '=', 0)
+      .count('* as unverified')
+      // .sum('amount as donated')
+      .firstOrFail();
+
+    response.ok({ ...verfiedCampaigns, ...unverfiedCampaigns });
+    return;
+  }
+  public async getUserDonationStats({ auth, response }: HttpContextContract) {
     const loggedUser = await auth.user;
 
     const supportedDetail = await Database.from('donations')

@@ -3,6 +3,7 @@ import { schema } from '@ioc:Adonis/Core/Validator';
 import Drive from '@ioc:Adonis/Core/Drive';
 import Campaign from 'App/Models/Campaign';
 export default class CampaignsController {
+  public pageCount() {return 12}
   public async createCampaign({ auth, request, response }: HttpContextContract) {
     const user = await auth.user;
     if (!user) {
@@ -102,13 +103,13 @@ export default class CampaignsController {
       const campaigns = await this.Campaigns()
         .andWhere('featured', true)
         .orderBy('id', 'desc')
-        .paginate(1, 10);
+        .paginate(1, this.pageCount());
 
       response.ok(campaigns);
       return;
     }
     if (type === 'trending') {
-      const campaigns = await this.Campaigns().orderBy('id', 'desc').paginate(1, 10);
+      const campaigns = await this.Campaigns().orderBy('id', 'desc').paginate(1, this.pageCount());
       response.ok(campaigns);
       return;
     }
@@ -126,7 +127,7 @@ export default class CampaignsController {
         await this.Campaigns()
           .andWhere('name', 'like', `%${search}%`)
           .orderBy('id', sort)
-          .paginate(page, 10)
+          .paginate(page, this.pageCount())
       );
       return
     }
@@ -137,7 +138,7 @@ export default class CampaignsController {
             q.where('id', category);
           })
           .orderBy('id', sort)
-          .paginate(page, 10)
+          .paginate(page, this.pageCount())
       );
       return
     }
@@ -145,7 +146,7 @@ export default class CampaignsController {
       await this.Campaigns()
 
         .orderBy('id', sort)
-        .paginate(page, 10)
+        .paginate(page, this.pageCount())
     );
     return
   }
