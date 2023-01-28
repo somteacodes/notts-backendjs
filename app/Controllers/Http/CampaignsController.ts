@@ -156,7 +156,7 @@ export default class CampaignsController {
 
   public async getAllMyCampaigns({ auth, request, response }) {
     const queryParams = request.qs();
-    const { search, page = 1, category, sort = 'desc' } = queryParams;
+    const { search, page = 1, sort = 'desc' } = queryParams;
 
     const user: User = await auth.user;
 
