@@ -49,10 +49,10 @@ export default class Campaign extends BaseModel {
   @column()
   public image: string | null;
 
-  @column({ serializeAs: null })
+  @column()
   public verified: number | null;
 
-  @column({ serializeAs: null })
+  @column()
   public featured: number | null;
 
 

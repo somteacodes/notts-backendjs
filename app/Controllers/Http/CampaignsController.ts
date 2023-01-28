@@ -2,8 +2,11 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import { schema } from '@ioc:Adonis/Core/Validator';
 import Drive from '@ioc:Adonis/Core/Drive';
 import Campaign from 'App/Models/Campaign';
+import User from 'App/Models/User';
 export default class CampaignsController {
-  public pageCount() {return 12}
+  public pageCount() {
+    return 9;
+  }
   public async createCampaign({ auth, request, response }: HttpContextContract) {
     const user = await auth.user;
     if (!user) {
@@ -122,14 +125,14 @@ export default class CampaignsController {
     const queryParams = request.qs();
     const { search, page = 1, category, sort = 'desc' } = queryParams;
 
-    if (search) {    
+    if (search) {
       response.ok(
         await this.Campaigns()
           .andWhere('name', 'like', `%${search}%`)
           .orderBy('id', sort)
           .paginate(page, this.pageCount())
       );
-      return
+      return;
     }
     if (category) {
       response.ok(
@@ -140,7 +143,7 @@ export default class CampaignsController {
           .orderBy('id', sort)
           .paginate(page, this.pageCount())
       );
-      return
+      return;
     }
     response.ok(
       await this.Campaigns()
@@ -148,7 +151,36 @@ export default class CampaignsController {
         .orderBy('id', sort)
         .paginate(page, this.pageCount())
     );
-    return
+    return;
+  }
+
+  public async getAllMyCampaigns({ auth, request, response }) {
+    const queryParams = request.qs();
+    const { search, page = 1, category, sort = 'desc' } = queryParams;
+
+    const user: User = await auth.user;
+
+    if (!user) {
+      response.ok();
+      return;
+    }
+    if (search) {
+      response.ok(
+        await this.Campaigns()
+          .andWhere('user_id', '=', user.id)
+          .andWhere('name', 'like', `%${search}%`)
+          .orderBy('id', sort)
+          .paginate(page, this.pageCount())
+      );
+      return;
+    }
+    response.ok(
+      await this.Campaigns()
+        .andWhere('user_id', '=', user.id)
+        .orderBy('id', sort)
+        .paginate(page, this.pageCount())
+    );
+    return;
   }
 
   public async getCampaignBySlug({ request, response }: HttpContextContract) {

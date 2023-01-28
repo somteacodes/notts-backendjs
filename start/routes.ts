@@ -45,5 +45,5 @@ Route.group(() => {
   Route.post('donation/save', 'DonationsController.saveDonation')
   Route.get('user/get/donation', 'UsersController.getUserDonationStats')
   Route.get('user/get/campaign/stats', 'UsersController.getUserCampaignStats')
- 
+  Route.get('user/get/campaigns', 'CampaignsController.getAllMyCampaigns')
 }).middleware(['auth']);
