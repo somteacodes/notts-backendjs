@@ -104,6 +104,7 @@ export default class CampaignsController {
   public async getCampaignsByType({ response, params: { type = 'all' } }: HttpContextContract) {
     if (type === 'featured') {
       const campaigns = await this.Campaigns()
+      .andWhere('verified', true)
         .andWhere('featured', true)
         .orderBy('id', 'desc')
         .paginate(1, this.pageCount());
@@ -112,7 +113,7 @@ export default class CampaignsController {
       return;
     }
     if (type === 'trending') {
-      const campaigns = await this.Campaigns().orderBy('id', 'desc').paginate(1, this.pageCount());
+      const campaigns = await this.Campaigns() .andWhere('verified', true).orderBy('id', 'desc').paginate(1, this.pageCount());
       response.ok(campaigns);
       return;
     }
@@ -128,6 +129,7 @@ export default class CampaignsController {
     if (search) {
       response.ok(
         await this.Campaigns()
+        .andWhere('verified', true)
           .andWhere('name', 'like', `%${search}%`)
           .orderBy('id', sort)
           .paginate(page, this.pageCount())
@@ -137,6 +139,7 @@ export default class CampaignsController {
     if (category) {
       response.ok(
         await this.Campaigns()
+        .andWhere('verified', true)
           .andWhereHas('category', (q) => {
             q.where('id', category);
           })
@@ -147,7 +150,7 @@ export default class CampaignsController {
     }
     response.ok(
       await this.Campaigns()
-
+      .andWhere('verified', true)
         .orderBy('id', sort)
         .paginate(page, this.pageCount())
     );
@@ -200,8 +203,7 @@ export default class CampaignsController {
   }
 
   protected Campaigns() {
-    return Campaign.query()
-      .andWhere('verified', true)
+    return Campaign.query()     
       .preload('category')
       .preload('rewards')
       .preload('user', (pq) => {
