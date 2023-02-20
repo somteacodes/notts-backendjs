@@ -15,6 +15,7 @@ import Profile from 'App/Models/Profile';
 import Role from './Role';
 import Campaign from './Campaign';
 import Donation from './Donation';
+import Bank from './Bank';
 export default class User extends BaseModel {
   @column({ isPrimary: true, serializeAs: null })
   public id: number;
@@ -67,4 +68,7 @@ export default class User extends BaseModel {
 
   @hasMany(() => Donation)
   public donations: HasMany<typeof Donation>;
+
+  @hasOne(()=>Bank)
+  public bank:HasOne<typeof Bank>
 }

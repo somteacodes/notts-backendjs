@@ -42,7 +42,7 @@ export default class UsersController {
       .count('* as verified')
       // .sum('amount as donated')
       .firstOrFail();
-      const unverfiedCampaigns = await Database.from('campaigns')
+    const unverfiedCampaigns = await Database.from('campaigns')
       .where('user_id', '=', loggedUser?.id || 0)
       .where('verified', '=', 0)
       .count('* as unverified')
@@ -67,5 +67,19 @@ export default class UsersController {
       .sum('amount as received')
       .firstOrFail();
     response.ok({ ...supportedDetail, ...supportingDetail });
+  }
+
+  public async getUserBankDetail({ auth, response }: HttpContextContract) {
+    const loggedUser = await auth.user;
+
+    const bankDetails = await loggedUser?.related('bank').query().firstOrFail();
+    response.ok(
+      bankDetails?.serialize({
+        fields: {
+          pick: ['account_number', 'account_name', 'bank_name'],
+        },
+      })
+    );
+    return;
   }
 }

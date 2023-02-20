@@ -32,6 +32,7 @@ Route.get('campaigns/get/:type?', 'CampaignsController.getCampaignsByType')
 Route.get('campaigns/all', 'CampaignsController.getAllCampaigns')
 Route.get('campaign/view/:slug','CampaignsController.getCampaignBySlug')
  Route.get('rewards/view/:slug','RewardsController.getRewards') //TODO this could be redundant, confirm where it is needed and clear this comment
+ Route.get('banks/accounts/:nuban', 'BanksController.getBanks');
 // protected routes
 
 Route.group(() => {
@@ -46,4 +47,7 @@ Route.group(() => {
   Route.get('user/get/donation', 'UsersController.getUserDonationStats')
   Route.get('user/get/campaign/stats', 'UsersController.getUserCampaignStats')
   Route.get('user/get/campaigns', 'CampaignsController.getAllMyCampaigns')
+  Route.get('user/bank/get/code','BanksController.getBankVerificationCode')
+  Route.post('user/bank/update','BanksController.updateBankDetails')
+  Route.get('user/bank/detail', 'UsersController.getUserBankDetail')
 }).middleware(['auth']);

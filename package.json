@@ -65,6 +65,7 @@
     "@adonisjs/repl": "^3.1.11",
     "@adonisjs/view": "^6.2.0",
     "aws-sdk": "^2.1249.0",
+    "dayjs": "^1.11.7",
     "jsonwebtoken": "^8.5.1",
     "luxon": "^3.0.4",
     "mysql2": "^2.3.3",
