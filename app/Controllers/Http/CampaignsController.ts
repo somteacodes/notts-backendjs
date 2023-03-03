@@ -126,7 +126,7 @@ export default class CampaignsController {
     const queryParams = request.qs();
     const { search, page = 1, category, sort = 'desc' } = queryParams;
 
-    if (search) {
+    if (search) { 
       response.ok(
         await this.Campaigns()
         .andWhere('verified', true)
