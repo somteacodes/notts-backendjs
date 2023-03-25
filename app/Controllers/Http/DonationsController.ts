@@ -1,10 +1,26 @@
+import Env  from '@ioc:Adonis/Core/Env';
 import { schema, rules } from '@ioc:Adonis/Core/Validator';
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import Campaign from 'App/Models/Campaign';
 import Donation from 'App/Models/Donation';
 import User from 'App/Models/User';
-
+import axios from 'axios';
 export default class DonationsController {
+
+  private async verifyDonation({ auth,request, response }: HttpContextContract) {
+    const user = await auth.user;
+    // extract the conditional statement below to a private method
+
+    if(!user){
+      response.unauthorized({message:'You need to be logged in'})
+      return;
+    }
+    const verifyPaymentReference= await axios.get(`https://api.paystack.co/transaction/verify/${request.body().reference}`,{
+      headers: { Authorization: `Bearer ${Env.get('PAYSTACK_PUBLIC_TEST_KEY')}` },
+    });
+return verifyPaymentReference;
+
+   }
   public async saveDonation({ auth, request, response }: HttpContextContract) {
     const user = await auth.user;
     if (!user) {

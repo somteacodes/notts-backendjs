@@ -39,6 +39,7 @@ Route.group(() => {
   Route.post('requestVerification/email', 'AuthController.requestVerification');
   Route.post('verify/email', 'AuthController.verifyCodeFromEmail');
   Route.post('user/upload/image', 'UsersController.uploadImage');
+  Route.post('user/details/update', 'UsersController.updateDetails')
   Route.post('campaign/upload/image', 'CampaignsController.uploadImage')
   Route.post('campaign/create', 'CampaignsController.createCampaign');
   Route.get('campaign/d/view/:type/:slug','CampaignsController.viewMyCampaign')
@@ -50,4 +51,7 @@ Route.group(() => {
   Route.get('user/bank/get/code','BanksController.getBankVerificationCode')
   Route.post('user/bank/update','BanksController.updateBankDetails')
   Route.get('user/bank/detail', 'UsersController.getUserBankDetail')
+  Route.post('user/phone/sendcode', 'UsersController.sendCodeToPhone')
+  // FOR TESTING
+  Route.post('user/phone/verifycode', 'UsersController.verifyCodeFromPhone')
 }).middleware(['auth']);

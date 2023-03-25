@@ -34,4 +34,8 @@ export default Env.rules({
   S3_ENDPOINT: Env.schema.string.optional(),
   GCS_KEY_FILENAME: Env.schema.string(),
   GCS_BUCKET: Env.schema.string(),
+  TWILLO_ACCOUNT_SID:Env.schema.string(),
+  TWILLO_AUTH_TOKEN:Env.schema.string(),
+  TWILLO_SERVICE_ID:Env.schema.string(),
+  PAYSTACK_PUBLIC_TEST_KEY:Env.schema.string(),
 });

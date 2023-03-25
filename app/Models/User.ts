@@ -16,6 +16,7 @@ import Role from './Role';
 import Campaign from './Campaign';
 import Donation from './Donation';
 import Bank from './Bank';
+import VerificationRequest from './VerificationRequest';
 export default class User extends BaseModel {
   @column({ isPrimary: true, serializeAs: null })
   public id: number;
@@ -71,4 +72,7 @@ export default class User extends BaseModel {
 
   @hasOne(()=>Bank)
   public bank:HasOne<typeof Bank>
+
+  @hasOne(()=>VerificationRequest)
+  public verificationRequest:HasOne<typeof VerificationRequest>
 }

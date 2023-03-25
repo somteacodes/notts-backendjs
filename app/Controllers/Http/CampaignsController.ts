@@ -5,7 +5,7 @@ import Campaign from 'App/Models/Campaign';
 import User from 'App/Models/User';
 export default class CampaignsController {
   public pageCount() {
-    return 9;
+    return 12;
   }
   public async createCampaign({ auth, request, response }: HttpContextContract) {
     const user = await auth.user;
@@ -126,7 +126,7 @@ export default class CampaignsController {
     const queryParams = request.qs();
     const { search, page = 1, category, sort = 'desc' } = queryParams;
 
-    if (search) { 
+    if (search) {
       response.ok(
         await this.Campaigns()
         .andWhere('verified', true)
@@ -203,7 +203,7 @@ export default class CampaignsController {
   }
 
   protected Campaigns() {
-    return Campaign.query()     
+    return Campaign.query()
       .preload('category')
       .preload('rewards')
       .preload('user', (pq) => {

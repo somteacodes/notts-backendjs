@@ -1,7 +1,18 @@
+import { schema, rules } from '@ioc:Adonis/Core/Validator';
+import Env from '@ioc:Adonis/Core/Env';
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 // import Application from '@ioc:Adonis/Core/Application';
 import Drive from '@ioc:Adonis/Core/Drive';
 import Database from '@ioc:Adonis/Lucid/Database';
+import { timeDiff } from 'Config/utils';
+import dayjs from 'dayjs';
+// import axios from 'axios';
+// const axios = require('axios');
+
+const accountSid = Env.get('TWILLO_ACCOUNT_SID');
+const authToken = Env.get('TWILLO_AUTH_TOKEN');
+const serviceId = Env.get('TWILLO_SERVICE_ID');
+const client = require('twilio')(accountSid, authToken);
 
 export default class UsersController {
   public async index() {
@@ -81,5 +92,131 @@ export default class UsersController {
       })
     );
     return;
+  }
+
+  public async updateDetails({ auth, request, response }: HttpContextContract) {
+    const user = await auth.user;
+    if (!user) {
+      response.unauthorized();
+      return;
+    }
+
+    // sanitize post
+    const updateSchema = schema.create({
+      firstName: schema.string([rules.trim(), rules.escape()]),
+      lastName: schema.string([rules.trim(), rules.escape()]),
+      phone: schema.string.optional([rules.trim(), rules.escape()]),
+      code: schema.string.optional([rules.trim(), rules.escape()]),
+    });
+    const payload = await request.validate({ schema: updateSchema });
+
+    const details = await user.related('profile').query().first();
+    if (!payload.phone || payload.phone == details?.phone) {
+      //  NO NEED TO CHANGE, CHECK IF CODE
+      response.ok({ message: 'No need to Change phone, just names' });
+      await user
+        .related('profile')
+        .query()
+        .update({ firstName: payload.firstName, lastName: payload.lastName });
+
+      return;
+    } else {
+      // CHANGE PHONE, VERIFY CODE
+      if (!payload.code) {
+        response.badRequest();
+        return;
+      }
+      // VERIFY CODE
+      const verifyCode: string = await this.twilloCode(
+        payload.phone.toString(),
+        'verify',
+        payload.code
+      );
+      if (verifyCode !== '') {
+        response.badRequest({ message: 'code is wrong or has expired' });
+        return;
+      }
+      await user
+        .related('profile')
+        .query()
+        .update({ firstName: payload.firstName, lastName: payload.lastName, phone: payload.phone });
+ response.ok({ message: 'done' });
+      return;
+
+
+    }
+
+  }
+
+  public async sendCodeToPhone({ auth, request, response }: HttpContextContract) {
+    const user = await auth.user;
+    if (!user) {
+      response.unauthorized();
+      return;
+    }
+    const payload = request.body();
+    // create entries if non exists and send SMS
+    const retries = await user
+      .related('verificationRequest')
+      .firstOrCreate({}, { userId: user.id, phoneTries: 1 });
+    if (retries.$isLocal) {
+      //  SEND SMS
+      const sendSMS = await this.twilloCode(`+${payload.phone.trim()}`, 'request');
+      response.ok({ retries, sendSMS, existing: false });
+      return;
+    } else {
+      // existing db row, check time
+      const duration = Math.round(Math.exp(retries.phoneTries!));
+      const timeDifference = timeDiff(dayjs(), dayjs(retries.updatedAt.toString()), 'minute');
+      if (timeDifference > duration) {
+        // request SMS and increase retries
+        const sendSMS = await this.twilloCode(`+${payload.phone.trim()}`, 'request');
+        await user
+          .related('verificationRequest')
+          .updateOrCreate({}, { userId: user.id, phoneTries: retries.phoneTries! + 1 });
+        response.ok({ retries, sendSMS, existing: true });
+        return;
+      } else {
+        // notify user of time left
+        response.ok({ retries, existing: true, timeLeft: duration });
+        return;
+      }
+    }
+  }
+  public async verifyCodeFromPhone({ auth, request, response }: HttpContextContract) {
+    const user = auth.user;
+    if (!user) {
+      response.unauthorized();
+      return;
+    }
+
+    const payload = request.body();
+
+    try {
+      const verifySMS = await this.twilloCode(`+${payload.phone.trim()}`, 'verify', payload.code);
+      response.ok(verifySMS);
+      return;
+    } catch (error) {
+      response.internalServerError(error);
+    }
+
+    return;
+  }
+  private async twilloCode(
+    phone: string,
+    type: 'request' | 'verify',
+    code: string = ''
+  ): Promise<string> {
+    if (type === 'request') {
+      return client.verify.v2
+        .services(serviceId)
+        .verifications.create({ to: phone, channel: 'sms' })
+        .then((verification) => verification.status);
+    } else {
+      return client.verify.v2
+        .services(serviceId)
+        .verificationChecks.create({ to: phone, code })
+        .then((verification_check) => verification_check.status);
+    }
   }
 }
