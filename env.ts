@@ -37,5 +37,6 @@ export default Env.rules({
   TWILLO_ACCOUNT_SID:Env.schema.string(),
   TWILLO_AUTH_TOKEN:Env.schema.string(),
   TWILLO_SERVICE_ID:Env.schema.string(),
-  PAYSTACK_PUBLIC_TEST_KEY:Env.schema.string(),
+  PAYSTACK_SECRET_TEST_KEY:Env.schema.string(),
+  PAYSTACK_VERIFY_URL:Env.schema.string(),
 });
