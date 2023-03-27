@@ -10,7 +10,7 @@ export default class extends BaseSeeder {
       { roleId: 3, email: 'user@email.com', password: 'password', verified: 1 },
     ])
       .with('profile', 1)
-      .with('campaigns', Math.floor(Math.random()*10) + 1,
+      .with('campaigns', Math.floor(Math.random()*5) + 1,
       (campaign) => {
         campaign
         .with('rewards', Math.floor(Math.random() * 3) + 1)

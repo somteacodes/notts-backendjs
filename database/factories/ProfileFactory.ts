@@ -8,7 +8,6 @@ export default Factory.define(Profile, ({ faker }) => {
     firstName: faker.name.firstName(),
     lastName: faker.name.lastName(),
     phone: faker.phone.number('0##########'),
-    image: faker.image.people(400,400,true),
-
+    image: faker.image.avatar(),
   }
 }).build()
