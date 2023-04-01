@@ -34,7 +34,7 @@ export default class AuthController {
     if (provider === 'google') {
       const { access_token } = request.body();
       try {
-        user = await this.authWithhGoogle(ally, access_token);
+        user = await this.authWithGoogle(ally, access_token);
       } catch {
         response.badRequest({ error: 'An error occurred, please try again' });
         return;
@@ -59,6 +59,7 @@ export default class AuthController {
       const payload = await request.validate({ schema: newAuthSchema });
       try {
         const { token } = await auth.use('api').attempt(payload.email, payload.password);
+
         user = await User.findBy('email', payload.email);
         await user.refresh();
         await user.load((loader) => {
@@ -73,7 +74,7 @@ export default class AuthController {
     if (provider === 'google') {
       const { access_token } = request.body();
       try {
-        user = await this.authWithhGoogle(ally, access_token);
+        user = await this.authWithGoogle(ally, access_token);
       } catch {
         response.badRequest({ error: 'Any error occurred, please try again.' });
         return;
@@ -90,14 +91,14 @@ export default class AuthController {
   public async verifyCodeFromEmail({ request, response }) {
     const jwt = require('jsonwebtoken');
     const { code } = request.body();
- 
+
     try {
       const { data } = await jwt.verify(code, 'notts2022@!');
       const user = await User.findBy('email', data);
       user!.verified = 1;
       await user!.save();
-       
-      response.ok({message:'email has been verified'});
+
+      response.ok({ message: 'email has been verified' });
     } catch (error) {
       const {
         payload: { data },
@@ -115,10 +116,10 @@ export default class AuthController {
       await this.sendCodeToEmail(email);
       response.ok({ message: 'Validation link sent to your email' });
     } catch (error) {
-      response.badRequest({ error})
+      response.badRequest({ error });
     }
   }
-  async sendCodeToEmail(email) {
+ private async sendCodeToEmail(email) {
     const jwt = require('jsonwebtoken');
     const token = jwt.sign(
       {
@@ -138,11 +139,11 @@ export default class AuthController {
     });
   }
 
-  async generateUserWithToken(auth, user) {
-    return await auth.use('api').generate(user);
+  private async generateUserWithToken(auth, user) {
+    return await auth.use('api').generate(user, { role: user.role.name });
   }
 
-  async authWithhGoogle(ally, access_token) {
+ private  async authWithGoogle(ally, access_token:string) {
     const userFromGoogle = await ally.use('google').userFromToken(access_token);
 
     const user = await User.firstOrCreate(
@@ -158,10 +159,10 @@ export default class AuthController {
 
     return user;
   }
-  async splitName(name = '') {
+  private async splitName(name = '') {
     const [firstName, ...lastName] = name.split(' ').filter(Boolean);
     return {
-      firstName: firstName,
+      firstName,
       lastName: lastName.join(' '),
     };
   }
