@@ -140,7 +140,7 @@ export default class AuthController {
   }
 
   private async generateUserWithToken(auth, user) {
-    return await auth.use('api').generate(user, { role: user.role.name });
+    return await auth.use('api').generate(user);
   }
 
  private  async authWithGoogle(ally, access_token:string) {
