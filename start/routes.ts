@@ -57,6 +57,7 @@ Route.group(() => {
   Route.group(() => {
     Route.get('user/get/token', 'UsersController.getUserFromToken');
     Route.get('users/all', 'UsersController.getAllUsers');
+    Route.put('admin/campaign/:slug/status', 'CampaignsController.changeCampaignStatus');
   }).middleware('checkRole:admin');
   // FOR TESTING
   Route.post('user/phone/verifycode', 'UsersController.verifyCodeFromPhone');
