@@ -28,30 +28,37 @@ Route.get('users', 'UsersController.index');
 
 Route.post('auth/register/:provider', 'AuthController.register');
 Route.post('auth/login/:provider', 'AuthController.login');
-Route.get('campaigns/get/:type?', 'CampaignsController.getCampaignsByType')
-Route.get('campaigns/all', 'CampaignsController.getAllCampaigns')
-Route.get('campaign/view/:slug','CampaignsController.getCampaignBySlug')
- Route.get('rewards/view/:slug','RewardsController.getRewards') //TODO this could be redundant, confirm where it is needed and clear this comment
- Route.get('banks/accounts/:nuban', 'BanksController.getBanks');
-// protected routes
+Route.get('campaigns/get/:type?', 'CampaignsController.getCampaignsByType');
+Route.get('campaigns/all', 'CampaignsController.getAllCampaigns');
+Route.get('campaign/view/:slug', 'CampaignsController.getCampaignBySlug');
+Route.get('rewards/view/:slug', 'RewardsController.getRewards'); //TODO this could be redundant, confirm where it is needed and clear this comment
+Route.get('banks/accounts/:nuban', 'BanksController.getBanks');
 
+// protected routes
 Route.group(() => {
   Route.post('requestVerification/email', 'AuthController.requestVerification');
   Route.post('verify/email', 'AuthController.verifyCodeFromEmail');
   Route.post('user/upload/image', 'UsersController.uploadImage');
-  Route.post('user/details/update', 'UsersController.updateDetails')
-  Route.post('campaign/upload/image', 'CampaignsController.uploadImage')
+  Route.post('user/details/update', 'UsersController.updateDetails');
+  Route.post('campaign/upload/image', 'CampaignsController.uploadImage');
   Route.post('campaign/create', 'CampaignsController.createCampaign');
-  Route.get('campaign/d/view/:type/:slug','CampaignsController.viewMyCampaign')
-  Route.post('reward/create','RewardsController.createReward')
-  Route.post('donation/save', 'DonationsController.saveDonation')
-  Route.get('user/get/donation', 'UsersController.getUserDonationStats')
-  Route.get('user/get/campaign/stats', 'UsersController.getUserCampaignStats')
-  Route.get('user/get/campaigns', 'CampaignsController.getAllMyCampaigns')
-  Route.get('user/bank/get/code','BanksController.getBankVerificationCode')
-  Route.post('user/bank/update','BanksController.updateBankDetails')
-  Route.get('user/bank/detail', 'UsersController.getUserBankDetail')
-  Route.post('user/phone/sendcode', 'UsersController.sendCodeToPhone')
+  Route.get('campaign/d/view/:type/:slug', 'CampaignsController.viewMyCampaign');
+  Route.post('reward/create', 'RewardsController.createReward');
+  Route.post('donation/save', 'DonationsController.saveDonation');
+  Route.get('user/get/donation', 'UsersController.getUserDonationStats');
+  Route.get('user/get/campaign/stats', 'UsersController.getUserCampaignStats');
+  Route.get('user/get/campaigns', 'CampaignsController.getAllMyCampaigns');
+  Route.get('user/bank/get/code', 'BanksController.getBankVerificationCode');
+  Route.post('user/bank/update', 'BanksController.updateBankDetails');
+  Route.get('user/bank/detail', 'UsersController.getUserBankDetail');
+  Route.post('user/phone/sendcode', 'UsersController.sendCodeToPhone');
+
+  // Admin group routes
+  Route.group(() => {
+    Route.get('user/get/token', 'UsersController.getUserFromToken');
+    Route.get('users/all', 'UsersController.getAllUsers');
+  }).middleware('checkRole:admin');
   // FOR TESTING
-  Route.post('user/phone/verifycode', 'UsersController.verifyCodeFromPhone')
+  Route.post('user/phone/verifycode', 'UsersController.verifyCodeFromPhone');
 }).middleware(['auth']);
+// Admin group routes

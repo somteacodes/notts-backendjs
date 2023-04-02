@@ -6,6 +6,7 @@ import Drive from '@ioc:Adonis/Core/Drive';
 import Database from '@ioc:Adonis/Lucid/Database';
 import { timeDiff } from 'Config/utils';
 import dayjs from 'dayjs';
+import User from 'App/Models/User';
 // import axios from 'axios';
 // const axios = require('axios');
 
@@ -15,6 +16,9 @@ const serviceId = Env.get('TWILLO_SERVICE_ID');
 const client = require('twilio')(accountSid, authToken);
 
 export default class UsersController {
+  private pageCount() {
+    return 12;
+  }
   public async index() {
     return 'Get Users';
   }
@@ -140,12 +144,9 @@ export default class UsersController {
         .related('profile')
         .query()
         .update({ firstName: payload.firstName, lastName: payload.lastName, phone: payload.phone });
- response.ok({ message: 'done' });
+      response.ok({ message: 'done' });
       return;
-
-
     }
-
   }
 
   public async sendCodeToPhone({ auth, request, response }: HttpContextContract) {
@@ -202,6 +203,34 @@ export default class UsersController {
 
     return;
   }
+
+  public async getAllUsers({ auth, request, response }: HttpContextContract) {
+    const user = await auth.user;
+
+    await user?.refresh();
+    await user?.load((loader) => {
+      loader.load('role');
+    });
+    if (!user || user?.role?.name !== 'admin') {
+      response.unauthorized();
+      return;
+    }
+    const queryParams = request.qs();
+    const { search, page = 1, sort = 'desc' } = queryParams;
+
+    if (search) {
+      response.ok(
+        await this.Users()
+          .andWhere('name', 'like', `%${search}%`)
+          .orderBy('id', sort)
+          .paginate(page, this.pageCount())
+      );
+      return;
+    }
+    response.ok(await this.Users().orderBy('id', sort).paginate(page, this.pageCount()));
+
+    return;
+  }
   private async twilloCode(
     phone: string,
     type: 'request' | 'verify',
@@ -218,5 +247,18 @@ export default class UsersController {
         .verificationChecks.create({ to: phone, code })
         .then((verification_check) => verification_check.status);
     }
+  }
+  protected Users() {
+    return User.query().preload('profile').preload('role');
+
+    // .withAggregate('rewards', (query) => {
+    //   query.count('*').as('rewards_count');
+    // })
+    // .withAggregate('donations', (query) => {
+    //   query.count('*').as('donations_count');
+    // })
+    // .withAggregate('donations', (query) => {
+    //   query.sum('amount').as('donated_total');
+    // });
   }
 }
