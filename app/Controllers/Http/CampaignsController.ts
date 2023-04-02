@@ -4,7 +4,7 @@ import Drive from '@ioc:Adonis/Core/Drive';
 import Campaign from 'App/Models/Campaign';
 import User from 'App/Models/User';
 export default class CampaignsController {
-  public pageCount() {
+  private pageCount() {
     return 12;
   }
   public async createCampaign({ auth, request, response }: HttpContextContract) {
