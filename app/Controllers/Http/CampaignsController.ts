@@ -129,7 +129,6 @@ export default class CampaignsController {
     if (search) {
       response.ok(
         await this.Campaigns()
-        .andWhere('verified', true)
           .andWhere('name', 'like', `%${search}%`)
           .orderBy('id', sort)
           .paginate(page, this.pageCount())
@@ -139,7 +138,6 @@ export default class CampaignsController {
     if (category) {
       response.ok(
         await this.Campaigns()
-        .andWhere('verified', true)
           .andWhereHas('category', (q) => {
             q.where('id', category);
           })
@@ -150,7 +148,6 @@ export default class CampaignsController {
     }
     response.ok(
       await this.Campaigns()
-      .andWhere('verified', true)
         .orderBy('id', sort)
         .paginate(page, this.pageCount())
     );
@@ -202,6 +199,20 @@ export default class CampaignsController {
     response.ok(campaign);
   }
 
+  public async changeCampaignStatus({auth, request, response }: HttpContextContract) {
+    const user = await auth.user;
+    if (!user) {
+      response.unauthorized({ message: 'You need to be logged in' });
+    return
+    }
+    const { slug } = request.params();
+    const { status } = request.body();
+    const campaign = await Campaign.findByOrFail('slug', slug);
+    campaign.verified = status ;
+    campaign.save();
+    response.ok({message:'Campaign status changed successfully'});
+    return
+  }
   protected Campaigns() {
     return Campaign.query()
       .preload('category')
