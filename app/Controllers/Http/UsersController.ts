@@ -7,6 +7,7 @@ import Database from '@ioc:Adonis/Lucid/Database';
 import { timeDiff } from 'Config/utils';
 import dayjs from 'dayjs';
 import User from 'App/Models/User';
+import Mail from '@ioc:Adonis/Addons/Mail';
 // import axios from 'axios';
 // const axios = require('axios');
 
@@ -230,6 +231,18 @@ export default class UsersController {
     response.ok(await this.Users().orderBy('id', sort).paginate(page, this.pageCount()));
 
     return;
+  }
+
+  public async sendEmail(){
+    await Mail.send((message) => {
+      message
+        .from('noreply@email.notts.com.ng')
+        .to('anunobisomto@gmail.com')
+        .subject('Your Bank Change Verification Code')
+        .htmlView('emails/requestCode', {
+          verificationCode:"123456",
+        });
+    });
   }
   private async twilloCode(
     phone: string,

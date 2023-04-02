@@ -1,3 +1,4 @@
+import Env from '@ioc:Adonis/Core/Env';
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import { schema, rules } from '@ioc:Adonis/Core/Validator';
 import Mail from '@ioc:Adonis/Addons/Mail';
@@ -110,10 +111,10 @@ export default class AuthController {
     }
   }
 
-  public async requestVerification({ request, response }) {
-    const { email } = request.body();
+  public async requestVerification({auth, response }) {
+    const user = await auth.user
     try {
-      await this.sendCodeToEmail(email);
+      await this.sendCodeToEmail(user.email);
       response.ok({ message: 'Validation link sent to your email' });
     } catch (error) {
       response.badRequest({ error });
@@ -130,11 +131,11 @@ export default class AuthController {
     );
     await Mail.sendLater((message) => {
       message
-        .from('noreply@notts.com.ng')
+        .from('noreply@email.notts.com.ng')
         .to(email)
         .subject('Verify your account')
         .htmlView('emails/verify', {
-          url: `https://www.notts.com.ng/verify?token=${token}`,
+          url: `${Env.get('FRONTEND_URL')}/verify?token=${token}`,
         });
     });
   }

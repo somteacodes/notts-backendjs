@@ -33,7 +33,7 @@ Route.get('campaigns/all', 'CampaignsController.getAllCampaigns');
 Route.get('campaign/view/:slug', 'CampaignsController.getCampaignBySlug');
 Route.get('rewards/view/:slug', 'RewardsController.getRewards'); //TODO this could be redundant, confirm where it is needed and clear this comment
 Route.get('banks/accounts/:nuban', 'BanksController.getBanks');
-
+Route.get('mail/test', 'UsersController.sendEmail');
 // protected routes
 Route.group(() => {
   Route.post('requestVerification/email', 'AuthController.requestVerification');

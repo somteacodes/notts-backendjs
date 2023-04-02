@@ -6,7 +6,7 @@ import { getPossibleBanks } from 'Config/nuban';
 import Bank from 'App/Models/Bank';
 
 export default class BanksController {
- 
+
   public async updateBankDetails({ auth, request, response }: HttpContextContract) {
     const user = await auth.user;
     if (!user) {
@@ -40,7 +40,7 @@ export default class BanksController {
   }
 
   public async getBankVerificationCode({
-    auth, 
+    auth,
     response,
   }: HttpContextContract): Promise<void> {
     const user = await auth.user;
@@ -59,7 +59,7 @@ export default class BanksController {
 
     await Mail.sendLater((message) => {
       message
-        .from('noreply@notts.com.ng')
+        .from('noreply@email.notts.com.ng')
         .to(user!.email)
         .subject('Your Bank Change Verification Code')
         .htmlView('emails/requestCode', {
