@@ -94,19 +94,21 @@ export default class AuthController {
     const { code } = request.body();
 
     try {
-      const { data } = await jwt.verify(code, 'notts2022@!');
+      const { data } = await jwt.verify(code,Env.get('JWT_SECRET'));
       const user = await User.findBy('email', data);
-      user!.verified = 1;
-      await user!.save();
+      if(user){
+        user.verified = 1;
+        await user.save();
+        response.ok({ message: 'email has been verified' });
+        return
+      }else{
+        response.badRequest({ error: 'Wrong code or code has expired' });
+        return;
+      }
 
-      response.ok({ message: 'email has been verified' });
     } catch (error) {
-      const {
-        payload: { data },
-      } = await jwt.decode(code, { complete: true });
 
-      this.sendCodeToEmail(data);
-      response.badRequest({ error: 'another another code has been sent' });
+      response.badRequest({ error: 'Wrong code or code has expired' });
       return;
     }
   }
@@ -126,8 +128,8 @@ export default class AuthController {
       {
         data: email,
       },
-      'notts2022@!',
-      { expiresIn: '6h' }
+      Env.get('JWT_SECRET'),
+      { expiresIn:Env.get('JWT_EXPIRY') }
     );
     await Mail.sendLater((message) => {
       message

@@ -40,4 +40,6 @@ export default Env.rules({
   PAYSTACK_SECRET_TEST_KEY:Env.schema.string(),
   PAYSTACK_VERIFY_URL:Env.schema.string(),
   FRONTEND_URL:Env.schema.string(),
+  JWT_SECRET:Env.schema.string(),
+  JWT_EXPIRY:Env.schema.string(),
 });
