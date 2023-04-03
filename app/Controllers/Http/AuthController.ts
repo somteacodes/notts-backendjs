@@ -89,7 +89,7 @@ export default class AuthController {
     }
   }
 
-  public async verifyCodeFromEmail({ request, response }) {
+  public async verifyCodeFromEmail({request, response }) {
     const jwt = require('jsonwebtoken');
     const { code } = request.body();
 
